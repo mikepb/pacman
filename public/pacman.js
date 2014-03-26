@@ -1083,8 +1083,8 @@ var PACMAN = (function () {
         }, map);
 
         for (i = 0, len = ghostSpecs.length; i < len; i += 1) {
-            // ghost = new Pacman.Ghost({"getTick":getTick}, map, ghostSpecs[i]);
-            // ghosts.push(ghost);
+            ghost = new Pacman.Ghost({"getTick":getTick}, map, ghostSpecs[i]);
+            ghosts.push(ghost);
         }
 
         map.draw(ctx);
