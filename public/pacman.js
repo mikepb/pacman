@@ -433,6 +433,8 @@ Pacman.User = function (game, map) {
         if ((isMidSquare(position.y) || isMidSquare(position.x)) &&
             block === Pacman.BISCUIT || block === Pacman.PILL) {
 
+            socket.emit('eat', block === Pacman.BISCUIT ? 'biscuit' : 'pill');
+
             map.setBlock(nextWhole, Pacman.EMPTY);
             addScore((block === Pacman.BISCUIT) ? 10 : 50);
             eaten += 1;
@@ -509,6 +511,59 @@ Pacman.User = function (game, map) {
                 Math.PI * angle.end, angle.direction);
 
         ctx.fill();
+
+        // draw direction triangle
+
+        ctx.fillStyle   = '#0f0';
+        ctx.beginPath();
+
+        var dir = direction === NONE ? due : direction;
+        var headx = (position.x/10) * s + s/2;
+        var heady = (position.y/10) * s + s/2;
+        var p1x, p1y, p2x, p2y;
+        switch (dir) {
+            case UP:    heady -= s/4; break;
+            case DOWN:  heady += s/4; break;
+            case RIGHT: headx += s/4; break;
+            case LEFT:  headx -= s/4; break;
+        }
+        switch (dir) {
+            case UP:
+                p1x = headx + s/4;
+                p1y = heady + s/4;
+                p2x = headx - s/4;
+                p2y = heady + s/4;
+                heady -= s/4;
+                break;
+            case DOWN:
+                p1x = headx + s/4;
+                p1y = heady - s/4;
+                p2x = headx - s/4;
+                p2y = heady - s/4;
+                heady += s/4;
+                break;
+            case RIGHT:
+                p1x = headx - s/4;
+                p1y = heady + s/4;
+                p2x = headx - s/4;
+                p2y = heady - s/4;
+                headx += s/4;
+                break;
+            case LEFT:
+                p1x = headx + s/4;
+                p1y = heady + s/4;
+                p2x = headx + s/4;
+                p2y = heady - s/4;
+                headx -= s/4;
+                break;
+        }
+
+        ctx.moveTo(headx, heady);
+        ctx.lineTo(p1x, p1y);
+        ctx.lineTo(p2x, p2y);
+        ctx.lineTo(headx, heady);
+
+        ctx.fill();
     };
 
     var twdir = 0;
@@ -517,13 +572,11 @@ Pacman.User = function (game, map) {
     twcw[RIGHT] = DOWN;
     twcw[DOWN] = LEFT;
     twcw[LEFT] = UP;
-    twcw[NONE] = twcw[due];
     var twqw = {};
     twqw[UP] = LEFT;
     twqw[RIGHT] = UP;
     twqw[DOWN] = RIGHT;
     twqw[LEFT] = DOWN;
-    twqw[NONE] = twqw[due];
     var twop = {};
     twop[UP] = DOWN;
     twop[RIGHT] = LEFT;
